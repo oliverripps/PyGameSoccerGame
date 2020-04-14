@@ -9,20 +9,50 @@ class game:
     self.thingsToDisplay.append(thing)
 
 
+
+
 class ball:
   def __init__(self,still):
+    self.isselected=False
     self.piece = 'images/ball.png'
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(20,20))
     self.x = 390
+    self.angle=0
     self.y = 390
-    moving = not still
+    self.moving = not still
+class bar:
+  def __init__(self):
+    self.color = (0,0,0)
+    self.value=0
+    self.x = 750
+    self.y = 120
+  def add(self):
+    if(self.value<8):
+        self.setvalue(self.value+1)
+  def minus(self):
+    if(self.value>0):
+        self.setvalue(self.value-1)  
+  def setvalue(self,val):
+    self.value=val
+    if(val==0):
+        self.color = (0,0,0)
+    if(val==1 or val ==2):
+        self.color = (0,128,0)
+    if(val==3 or val ==4):
+        self.color = (255,255,0)
+    if(val==5 or val ==6):
+        self.color = (255,165,0)
+    if(val==7 and val ==8):
+        self.color = (255,0,0)
+
 
 
 
 class player:
   def __init__(self,team,position):
     self.team = team
+    self.isselected=False
     if(team==1):
       self.piece='images/arsenal.png'
     if(team==2):
@@ -51,8 +81,18 @@ class player:
     if(position=='CB' and team==2):
         self.y = 375
         self.x = 80
+    self.angle = 0
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(50,50))
+  def isteam1(self):
+      return self.team==1
+  def isteam2(self):
+      return self.team==2
+  def select(self):
+      self.isselected=True
+  def unselect(self):
+      self.isselected=False
+
     
       
     
@@ -77,6 +117,7 @@ def setupgame(name):#sets up the game
   currentgame.add(cb1)
   currentgame.add(cb2)
   
+  
   return currentgame.thingsToDisplay
   
   
@@ -91,24 +132,55 @@ field = pygame.image.load('images/field.jpg')
 field = pygame.transform.scale(field,(800,542))
 pygame.display.set_caption("Soccer Game")#Title of Window
 basicfont = pygame.font.SysFont(None, 48)
+powerfont = pygame.font.SysFont(None, 20)
+powertext = powerfont.render('Power Bar', True, (255,255,255), (0, 0, 0))
 text = basicfont.render('Soccer Game', True, (255, 255, 255), (0, 0, 0))#Setting Title at top of Screen
 textrectangle = text.get_rect()#Creating rectangle for text
 textrectangle.centerx = window.get_rect().centerx
 textrectangle.top = 40
 dis = setupgame('Oliver')
-
+powerbar = bar()
+somethingselected=False
+currentlyselected=player(1, 'rm')
+turn = 1
 running = True
+state='game'
 while running:
-  window.fill((0,0,0))
-  window.blit(field, (0,129))
-  window.blit(text, textrectangle)
-  for o in dis:
-      window.blit(o.piece,(o.x,o.y))
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      running = False
-    pygame.display.update()
-
+  if(state=='game'):
+      window.fill((0,0,0))
+      window.blit(field, (0,129))
+      window.blit(text, textrectangle)
+      window.blit(powertext,(725,20))
+      powerrect = pygame.Rect(powerbar.x,powerbar.y,15,powerbar.value*-10)
+      pygame.draw.rect(window,powerbar.color,powerrect)
+      ev = pygame.event.get()
+      for o in dis:
+          window.blit(o.piece,(o.x,o.y))
+          if (o.isselected):
+              pygame.draw.circle(window,(255,255,0),(o.x+25,o.y+25),26,2)
+      for event in pygame.event.get():
+      
+        if event.type == pygame.MOUSEBUTTONUP:
+          pos = pygame.mouse.get_pos()
+          for o in dis:
+              xdif = pos[0]-o.x
+              ydif = pos[1]-o.y
+              if xdif > -50 and xdif<50 and ydif > -50 and ydif < 50 and o.team==turn:
+                  old = currentlyselected
+                  currentlyselected = o
+                  old.unselect()
+                  o.select()
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:#add instructions
+                running = False
+            if event.key == pygame.K_w:#add instructions
+                powerbar.add()
+            if event.key == pygame.K_s:#add instructions
+                powerbar.minus()
+                
+        pygame.display.update()
 
 
 pygame.quit()
