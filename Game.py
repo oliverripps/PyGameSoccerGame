@@ -1,3 +1,4 @@
+
 import pygame
 import time
 
@@ -21,6 +22,7 @@ class ball:
     self.angle=0
     self.y = 390
     self.moving = not still
+
 class bar:
   def __init__(self):
     self.color = (0,0,0)
@@ -179,7 +181,20 @@ while running:
                 powerbar.add()
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
-                
+            #next steps
+            #USE BRANCHES!!!!!! everyone make a branch
+            #will-angle arrow thing
+            #oliver-space bar applies power and angle
+            #ryan-x value and y value
+                #x+=(cos(angle))
+                #y+=(sin(angle))
+            #nic-ball/peice collisions(direct, power, angles...)
+                #be the hardest so prob need all of us
+            #oliver
+            #levels and losing/winning(scoreboard--turns/goals/level number)
+            #menu screen easy medium hard
+            #
+            
         pygame.display.update()
 
 
