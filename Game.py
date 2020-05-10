@@ -47,6 +47,12 @@ class bar:
         self.color = (255,165,0)
     if(val==7 and val ==8):
         self.color = (255,0,0)
+  def getpower(self):
+    return self.val
+
+  def clear(self):
+    val=0
+  
 
 
 
@@ -86,6 +92,7 @@ class player:
     self.angle = 0
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(50,50))
+    self.speed = 0
   def isteam1(self):
       return self.team==1
   def isteam2(self):
@@ -94,7 +101,11 @@ class player:
       self.isselected=True
   def unselect(self):
       self.isselected=False
-
+  def getangle(self):
+      return angle
+  def go(self, p, a):
+      angle=a
+      speed=p
     
       
     
@@ -181,6 +192,9 @@ while running:
                 powerbar.add()
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
+            if event.key == pygame.K_SPACE:
+                currentlyselected.go(power,angle)
+                powerbar.clear()
             #next steps
             #USE BRANCHES!!!!!! everyone make a branch
             #will-angle arrow thing
