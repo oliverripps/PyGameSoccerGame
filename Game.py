@@ -133,7 +133,11 @@ def setupgame(name):#sets up the game
   
   return currentgame.thingsToDisplay
   
-  
+
+def reset():
+  return null
+
+
 pygame.init()
 pygame.font.init()
 
@@ -172,6 +176,26 @@ i4= controlsfont.render('Press:', True, (0, 0, 0), (86, 176, 17))
 i4r = i4.get_rect()
 i4r.centerx = 300
 i4r.top =  400
+r1= controlsfont.render('instructions', True, (255, 255, 255), (0, 0, 0))
+r1r = r1.get_rect()
+r1r.centerx = window.get_rect().centerx
+r1r.top = 400
+r2= controlsfont.render('Buttons to press', True, (255, 255, 255), (0, 0, 0))
+r2r = r2.get_rect()
+r2r.centerx = window.get_rect().centerx
+r2r.top =  450
+r3= controlsfont.render('At anytime press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
+r3r = r3.get_rect()
+r3r.centerx = window.get_rect().centerx
+r3r.top =  500
+r4= basicfont.render('How To Play', True, (255, 255, 255), (0, 0, 0))
+r4r = r4.get_rect()
+r4r.centerx = window.get_rect().centerx
+r4r.top =  200
+g1= controlsfont.render('Press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
+g1r = g1.get_rect()
+g1r.centerx = window.get_rect().centerx
+g1r.top = 700
 powertext = powerfont.render('Power Bar', True, (255,255,255), (0, 0, 0))
 gametext = basicfont.render('London Derby(Emirates Stadium)', True, (255, 255, 255), (0, 0, 0))#Setting Title at top of Screen
 gametextrectangle = gametext.get_rect()#Creating rectangle for text
@@ -201,6 +225,28 @@ while running:
                 running = False
             if event.key == pygame.K_p:#add instructions
                 state='game'
+            if event.key == pygame.K_i:#add instructions
+                state='instructions'
+            
+
+      pygame.display.update()
+  if(state=='instructions'):
+      window.fill((0,0,0))
+      window.blit(r1,r1r)
+      window.blit(r2,r2r)
+      window.blit(r3,r3r)
+      window.blit(r4,r4r)
+      for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+            running = False
+         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:#add instructions
+                running = False
+            if event.key == pygame.K_p:#add instructions
+                state='game'
+            if event.key == pygame.K_m:#add instructions
+                state='menu'
+            
 
       pygame.display.update()
       
@@ -211,13 +257,14 @@ while running:
       window.blit(powertext,(725,20))
       powerrect = pygame.Rect(powerbar.x,powerbar.y,15,powerbar.value*-10)
       pygame.draw.rect(window,powerbar.color,powerrect)
+      window.blit(g1,g1r)
       ev = pygame.event.get()
       for o in dis:
           window.blit(o.piece,(o.x,o.y))
           if (o.isselected):
               pygame.draw.circle(window,(255,255,0),(o.x+25,o.y+25),26,2)
       for event in pygame.event.get():
-      
+        
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()
           for o in dis:
@@ -249,12 +296,20 @@ while running:
                 #y+=(sin(angle))
             #nic-ball/peice collisions(direct, power, angles...)
                 #be the hardest so prob need all of us
-            #oliver
-            #levels and losing/winning(scoreboard--turns/goals/level number)
-            #menu screen easy medium hard
-            #
-            
+      
         pygame.display.update()
-
+  if(state=='over'):
+      window.fill((0,0,0))
+      for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+            running = False
+         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:#add instructions
+                running = False
+            if event.key == pygame.k_a:
+                reset()
+            
+      pygame.display.update()
+    
 
 pygame.quit()
