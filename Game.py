@@ -47,6 +47,12 @@ class bar:
         self.color = (255,165,0)
     if(val==7 and val ==8):
         self.color = (255,0,0)
+  def getpower(self):
+    return self.val
+
+  def clear(self):
+    val=0
+  
 
 
 
@@ -86,6 +92,7 @@ class player:
     self.angle = 0
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(50,50))
+    self.speed = 0
   def isteam1(self):
       return self.team==1
   def isteam2(self):
@@ -94,7 +101,11 @@ class player:
       self.isselected=True
   def unselect(self):
       self.isselected=False
-
+  def getangle(self):
+      return angle
+  def go(self, p, a):
+      angle=a
+      speed=p
     
       
     
@@ -122,7 +133,11 @@ def setupgame(name):#sets up the game
   
   return currentgame.thingsToDisplay
   
-  
+
+def reset():
+  return null
+
+
 pygame.init()
 pygame.font.init()
 
@@ -132,36 +147,124 @@ window = pygame.display.set_mode((width, height))
 
 field = pygame.image.load('images/field.jpg')
 field = pygame.transform.scale(field,(800,542))
-pygame.display.set_caption("Soccer Game")#Title of Window
+pygame.display.set_caption("Fling Footie")#Title of Window
 basicfont = pygame.font.SysFont(None, 48)
+menufont = pygame.font.SysFont(None, 60)
 powerfont = pygame.font.SysFont(None, 20)
+controlsfont = pygame.font.SysFont(None, 30)
+menutext = menufont.render('Fling Footie', True, (255, 255, 255), (86, 176, 17))
+menurectangle = menutext.get_rect()
+menurectangle.centerx = window.get_rect().centerx
+menurectangle.top = 200
+menudes = basicfont.render('Our Shuffle Board Soccer Mashup!', True, (255, 255, 255), (86, 176, 17))
+menudesrectangle = menudes.get_rect()
+menudesrectangle.centerx = window.get_rect().centerx
+menudesrectangle.top =  275
+i1= controlsfont.render('P to play', True, (0, 0, 0), (86, 176, 17))
+i1r = i1.get_rect()
+i1r.centerx = window.get_rect().centerx
+i1r.top =  450
+i2= controlsfont.render('I for instructions/rules', True, (0, 0, 0), (86, 176, 17))
+i2r = i2.get_rect()
+i2r.centerx = window.get_rect().centerx
+i2r.top =  500
+i3= controlsfont.render('Q to quit', True, (0, 0, 0), (86, 176, 17))
+i3r = i3.get_rect()
+i3r.centerx = window.get_rect().centerx
+i3r.top =  550
+i4= controlsfont.render('Press:', True, (0, 0, 0), (86, 176, 17))
+i4r = i4.get_rect()
+i4r.centerx = 300
+i4r.top =  400
+r1= controlsfont.render('instructions', True, (255, 255, 255), (0, 0, 0))
+r1r = r1.get_rect()
+r1r.centerx = window.get_rect().centerx
+r1r.top = 400
+r2= controlsfont.render('Buttons to press', True, (255, 255, 255), (0, 0, 0))
+r2r = r2.get_rect()
+r2r.centerx = window.get_rect().centerx
+r2r.top =  450
+r3= controlsfont.render('At anytime press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
+r3r = r3.get_rect()
+r3r.centerx = window.get_rect().centerx
+r3r.top =  500
+r4= basicfont.render('How To Play', True, (255, 255, 255), (0, 0, 0))
+r4r = r4.get_rect()
+r4r.centerx = window.get_rect().centerx
+r4r.top =  200
+g1= controlsfont.render('Press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
+g1r = g1.get_rect()
+g1r.centerx = window.get_rect().centerx
+g1r.top = 700
 powertext = powerfont.render('Power Bar', True, (255,255,255), (0, 0, 0))
-text = basicfont.render('Soccer Game', True, (255, 255, 255), (0, 0, 0))#Setting Title at top of Screen
-textrectangle = text.get_rect()#Creating rectangle for text
-textrectangle.centerx = window.get_rect().centerx
-textrectangle.top = 40
+gametext = basicfont.render('London Derby(Emirates Stadium)', True, (255, 255, 255), (0, 0, 0))#Setting Title at top of Screen
+gametextrectangle = gametext.get_rect()#Creating rectangle for text
+gametextrectangle.centerx = window.get_rect().centerx
+gametextrectangle.top = 40
 dis = setupgame('Oliver')
 powerbar = bar()
 somethingselected=False
 currentlyselected=player(1, 'rm')
 turn = 1
 running = True
-state='game'
+state='menu'
 while running:
+  if(state=='menu'):
+      window.fill((86,176,17))
+      window.blit(menutext,menurectangle)
+      window.blit(menudes,menudesrectangle)
+      window.blit(i1,i1r)
+      window.blit(i2,i2r)
+      window.blit(i3,i3r)
+      window.blit(i4,i4r)
+      for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+            running = False
+         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:#add instructions
+                running = False
+            if event.key == pygame.K_p:#add instructions
+                state='game'
+            if event.key == pygame.K_i:#add instructions
+                state='instructions'
+            
+
+      pygame.display.update()
+  if(state=='instructions'):
+      window.fill((0,0,0))
+      window.blit(r1,r1r)
+      window.blit(r2,r2r)
+      window.blit(r3,r3r)
+      window.blit(r4,r4r)
+      for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+            running = False
+         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:#add instructions
+                running = False
+            if event.key == pygame.K_p:#add instructions
+                state='game'
+            if event.key == pygame.K_m:#add instructions
+                state='menu'
+            
+
+      pygame.display.update()
+      
   if(state=='game'):
       window.fill((0,0,0))
       window.blit(field, (0,129))
-      window.blit(text, textrectangle)
+      window.blit(gametext, gametextrectangle)
       window.blit(powertext,(725,20))
       powerrect = pygame.Rect(powerbar.x,powerbar.y,15,powerbar.value*-10)
       pygame.draw.rect(window,powerbar.color,powerrect)
+      window.blit(g1,g1r)
       ev = pygame.event.get()
       for o in dis:
           window.blit(o.piece,(o.x,o.y))
           if (o.isselected):
               pygame.draw.circle(window,(255,255,0),(o.x+25,o.y+25),26,2)
       for event in pygame.event.get():
-      
+        
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()
           for o in dis:
@@ -181,6 +284,9 @@ while running:
                 powerbar.add()
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
+            if event.key == pygame.K_SPACE:
+                currentlyselected.go(power,angle)
+                powerbar.clear()
             #next steps
             #USE BRANCHES!!!!!! everyone make a branch
             #will-angle arrow thing
@@ -190,12 +296,20 @@ while running:
                 #y+=(sin(angle))
             #nic-ball/peice collisions(direct, power, angles...)
                 #be the hardest so prob need all of us
-            #oliver
-            #levels and losing/winning(scoreboard--turns/goals/level number)
-            #menu screen easy medium hard
-            #
-            
+      
         pygame.display.update()
-
+  if(state=='over'):
+      window.fill((0,0,0))
+      for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+            running = False
+         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:#add instructions
+                running = False
+            if event.key == pygame.k_a:
+                reset()
+            
+      pygame.display.update()
+    
 
 pygame.quit()
