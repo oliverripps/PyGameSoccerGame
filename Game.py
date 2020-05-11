@@ -1,6 +1,7 @@
 
 import pygame
 import time
+import math
 
 class game:
   def __init__(self,nameOfPlayer):
@@ -18,10 +19,14 @@ class ball:
     self.piece = 'images/ball.png'
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(20,20))
-    self.x = 390
     self.angle=0
+    self.speed=0
+    self.x = 390
     self.y = 390
     self.moving = not still
+    def move(self):
+        self.x += math.sin(self.angle) * self.speed
+        self.y -= math.cos(self.angle) * self.speed
 
 class bar:
   def __init__(self):
@@ -29,6 +34,7 @@ class bar:
     self.value=0
     self.x = 750
     self.y = 120
+    self.team = 3
   def add(self):
     if(self.value<8):
         self.setvalue(self.value+1)
@@ -54,6 +60,8 @@ class bar:
 class player:
   def __init__(self,team,position):
     self.team = team
+    self.speed=0
+    self.angle=0
     self.isselected=False
     if(team==1):
       self.piece='images/arsenal.png'
@@ -83,7 +91,6 @@ class player:
     if(position=='CB' and team==2):
         self.y = 375
         self.x = 80
-    self.angle = 0
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(50,50))
   def isteam1(self):
@@ -94,6 +101,9 @@ class player:
       self.isselected=True
   def unselect(self):
       self.isselected=False
+  def move(self):
+        self.x += math.sin(self.angle) * self.speed
+        self.y -= math.cos(self.angle) * self.speed
 
     
       
@@ -142,12 +152,15 @@ textrectangle.centerx = window.get_rect().centerx
 textrectangle.top = 40
 dis = setupgame('Oliver')
 powerbar = bar()
+currentAngle = 3.14
+moveTimer=0
 somethingselected=False
 currentlyselected=player(1, 'rm')
 turn = 1
 running = True
 state='game'
 while running:
+  pygame.time.delay(10)
   if(state=='game'):
       window.fill((0,0,0))
       window.blit(field, (0,129))
@@ -155,16 +168,20 @@ while running:
       window.blit(powertext,(725,20))
       powerrect = pygame.Rect(powerbar.x,powerbar.y,15,powerbar.value*-10)
       pygame.draw.rect(window,powerbar.color,powerrect)
-      ev = pygame.event.get()
       for o in dis:
+          #o.move()
           window.blit(o.piece,(o.x,o.y))
           if (o.isselected):
-              pygame.draw.circle(window,(255,255,0),(o.x+25,o.y+25),26,2)
+              if moveTimer>=0:
+                o.move()
+                moveTimer-=.1
+              pygame.draw.circle(window,(255,255,0),(int(o.x+25),int(o.y+25)),26,2)
       for event in pygame.event.get():
       
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()
           for o in dis:
+              #o.move()
               xdif = pos[0]-o.x
               ydif = pos[1]-o.y
               if xdif > -50 and xdif<50 and ydif > -50 and ydif < 50 and o.team==turn:
@@ -179,8 +196,30 @@ while running:
                 running = False
             if event.key == pygame.K_w:#add instructions
                 powerbar.add()
+                pygame.display.update()
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
+            if event.key == pygame.K_a:
+                currentAngle-=.1
+                print(currentAngle)
+            if event.key == pygame.K_d:
+                currentAngle+=.1
+                print(currentAngle)
+            if event.key == pygame.K_SPACE:
+                currentlyselected.angle=currentAngle
+                currentlyselected.speed=1
+                moveTimer=powerbar.value
+                #currentlyselected.speed=powerbar.value
+                #movement = [1,2,3,4,5,6,7,8,9,10]
+                #for i in movement:
+                #    currentlyselected.move()
+                #    pygame.display.update()
+                #    time.sleep(.1)
+
+                
+
+
+            
             #next steps
             #USE BRANCHES!!!!!! everyone make a branch
             #will-angle arrow thing
