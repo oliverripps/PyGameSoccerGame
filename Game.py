@@ -1,6 +1,7 @@
-
+import random
 import pygame
 import time
+import math
 
 class game:
   def __init__(self,nameOfPlayer):
@@ -21,8 +22,57 @@ class ball:
     self.x = 390
     self.angle=0
     self.y = 390
+    self.team=3
     self.moving = not still
+    self.deltax=0
+    self.deltay=0
 
+  def move(self):
+    if(self.deltax != 0 or self.deltay != 0):
+      if self.deltax > 2 or self.deltax < -2:
+        self.deltax *= .95
+        
+        self.x += int(self.deltax)
+        if self.x<60:#fix for left bound
+          if self.y>350 and self.y< 450:#fi
+            reset()
+          else:
+            self.deltax*=-1
+            self.x+=20
+            
+        if self.x>740:#fix for right bound
+          if self.y>350 and self.y< 450:#fi
+            reset()
+          else:
+            self.deltax*=-1
+            self.x-=20
+
+        if self.deltax < 2 and self.deltax >-2:
+          self.deltax=0
+          
+      if self.deltay > 2 or self.deltay < -2:
+        self.deltay *= .95
+        print("deltay:")
+        print(self.deltay)
+        self.y -= int(self.deltay)
+        if self.y<200:#fix for upper bound
+          self.deltay*=-1
+          
+            
+        if self.y>600:#fix for lower bound
+          print("too low")
+          print(self.deltay)
+          self.deltay=self.deltay *-1
+          print(self.deltay)
+          #self.y-=100
+
+        if self.deltay < 2 and self.deltay >-2:
+          self.deltax=0
+      
+      else:
+        if self in moving:
+          moving.remove(self)
+        
 class bar:
   def __init__(self):
     self.color = (0,0,0)
@@ -48,10 +98,11 @@ class bar:
     if(val==7 and val ==8):
         self.color = (255,0,0)
   def getpower(self):
-    return self.val
+    return self.value
 
   def clear(self):
-    val=0
+    self.value=0
+    self.color = (0,0,0)
   
 
 
@@ -92,7 +143,8 @@ class player:
     self.angle = 0
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(50,50))
-    self.speed = 0
+    self.deltax=0
+    self.deltay=0
   def isteam1(self):
       return self.team==1
   def isteam2(self):
@@ -104,9 +156,45 @@ class player:
   def getangle(self):
       return angle
   def go(self, p, a):
-      angle=a
-      speed=p
-    
+      self.angle=a
+      self.speed=p
+  
+  def move(self):
+    if(self.deltax != 0 or self.deltay != 0):
+      if self.deltax > 2 or self.deltax < -2:
+        self.deltax *= .95
+        
+        self.x += int(self.deltax)
+        if self.x<50:#fix for left bound
+          self.deltax*=-1
+          self.x+=(self.deltax/.9)
+          self.deltax*=.75
+        if self.x>700:#fix for right bound
+          self.deltax*=-1
+          self.x+=(self.deltax/.9)
+          self.deltax*=.75
+        if self.deltax < 2 and self.deltax >-2:
+          self.deltax=0
+          
+      if self.deltay > 2 or self.deltay < -2:
+        self.deltay *= .95
+        self.y -= int(self.deltay)
+        if self.y<150:#fix for upper bound
+          self.deltay*=-1
+          self.y-= (self.deltay/.9)
+          self.deltay*=.75
+            
+        if self.y>600:#fix for lower bound
+          self.deltay=self.deltay *-1
+          self.y-= (self.deltay/.9)
+          self.deltay*=.75
+        if self.deltay < 2 and self.deltay >-2:
+          self.deltax=0
+      
+      else:
+        if self in moving:
+          moving.remove(self)
+        
       
     
 def setupgame(name):#sets up the game
@@ -133,10 +221,21 @@ def setupgame(name):#sets up the game
   
   return currentgame.thingsToDisplay
   
-
 def reset():
-  return null
+  dis=setupgame('Oliver')
 
+def changeturn(v):
+  if(v==1):
+    return 2
+  if(v==2):
+    return 1
+  
+def getDistance(x1, y1, x2, y2):#https://www.pygame.org/wiki/CalculateDist
+    deltay = y2 - y1
+    deltax = x2 - x1
+    return math.sqrt(math.pow(deltax, 2) + math.pow(deltay, 2))
+
+        
 
 pygame.init()
 pygame.font.init()
@@ -202,10 +301,13 @@ gametextrectangle = gametext.get_rect()#Creating rectangle for text
 gametextrectangle.centerx = window.get_rect().centerx
 gametextrectangle.top = 40
 dis = setupgame('Oliver')
+moving = []
 powerbar = bar()
 somethingselected=False
 currentlyselected=player(1, 'rm')
+t=0
 turn = 1
+angle=0
 running = True
 state='menu'
 while running:
@@ -258,11 +360,12 @@ while running:
       powerrect = pygame.Rect(powerbar.x,powerbar.y,15,powerbar.value*-10)
       pygame.draw.rect(window,powerbar.color,powerrect)
       window.blit(g1,g1r)
-      ev = pygame.event.get()
       for o in dis:
-          window.blit(o.piece,(o.x,o.y))
-          if (o.isselected):
-              pygame.draw.circle(window,(255,255,0),(o.x+25,o.y+25),26,2)
+        window.blit(o.piece,(o.x,o.y))
+        o.move()
+        if (o.isselected):
+          pygame.draw.circle(window,(255,255,0),(int(o.x)+25,int(o.y)+25),26,2)
+      pygame.display.update()
       for event in pygame.event.get():
         
         if event.type == pygame.MOUSEBUTTONUP:
@@ -285,19 +388,18 @@ while running:
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
             if event.key == pygame.K_SPACE:
-                currentlyselected.go(power,angle)
+                angle= random.randint(1, 5)
+                currpow = powerbar.getpower()
+                currpow*=8
+                currentlyselected.deltax = currpow * math.cos(angle)
+                currentlyselected.deltay = currpow * math.sin(angle)
                 powerbar.clear()
-            #next steps
-            #USE BRANCHES!!!!!! everyone make a branch
-            #will-angle arrow thing
-            #oliver-space bar applies power and angle
-            #ryan-x value and y value
-                #x+=(cos(angle))
-                #y+=(sin(angle))
-            #nic-ball/peice collisions(direct, power, angles...)
-                #be the hardest so prob need all of us
-      
-        pygame.display.update()
+                moving.append(currentlyselected)
+                turn=changeturn(turn)
+                currentlyselected.isselected=False
+                currentlyselected=player(1, 'rm')
+
+      pygame.display.update()  
   if(state=='over'):
       window.fill((0,0,0))
       for event in pygame.event.get():
