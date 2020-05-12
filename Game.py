@@ -29,13 +29,13 @@ class ball:
 
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
-      if self.deltax > 2 or self.deltax < -2:
-        self.deltax *= .999
+      if self.deltax > 2.5 or self.deltax < -2.5:
+        self.deltax *= .98
 
         self.x += int(self.deltax)
         if self.x<60:#fix for left bound
           if self.y>350 and self.y< 450:#fi
-            reset(turn)
+            return turn
           else:
             self.deltax*=-1
             self.x+=20
@@ -43,17 +43,17 @@ class ball:
 
         if self.x>740:#fix for right bound
           if self.y>350 and self.y< 450:#fi
-            reset(turn)
+            return turn
           else:
             self.deltax*=-1
             self.x-=20
             self.centerx = self.x + 10
 
-        if self.deltax < 2 and self.deltax >-2:
+        if self.deltax < 2.5 and self.deltax >-2.5:
           self.deltax=0
 
-      if self.deltay > 2 or self.deltay < -2:
-        self.deltay *= .999
+      if self.deltay > 2.5 or self.deltay < -2.5:
+        self.deltay *= .98
         self.y -= int(self.deltay)
         self.centery = self.y + 10
         if self.y<200:#fix for upper bound
@@ -64,13 +64,12 @@ class ball:
           self.deltay=self.deltay *-1
           #self.y-=100
 
-        if self.deltay < 2 and self.deltay >-2:
+        if self.deltay < 2.5 and self.deltay >-2.5:
           self.deltax=0
 
-      else:
-        if self in moving:
-          moving.remove(self)
+    return 0
 
+    
 class bar:
   def __init__(self):
     self.color = (0,0,0)
@@ -184,14 +183,14 @@ class player:
           self.deltax*=-1
           self.x+=(self.deltax/.9)
           self.centerx = self.x + 25
-          self.deltax*=.75
-          self.deltay*=.75
+          #self.deltax*=.75
+          #self.deltay*=.75
         if self.x>700:#fix for right bound
           self.deltax*=-1
           self.x+=(self.deltax/.9)
           self.centerx = self.x + 25
-          self.deltax*=.75
-          self.deltay*=.75
+          #self.deltax*=.75
+          #self.deltay*=.75
         if self.deltax < 2 and self.deltax >-2:
           self.deltax=0
 
@@ -202,14 +201,14 @@ class player:
           self.deltay*=-1
           self.y-= (self.deltay/.9)
           self.centery = self.y + 25
-          self.deltay*=.75
-          self.deltax*=.75
+          #self.deltay*=.75
+          #self.deltax*=.75
         if self.y>600:#fix for lower bound
           self.deltay=self.deltay *-1
           self.y-= (self.deltay/.9)
           self.centery = self.y + 25
-          self.deltay*=.75
-          self.deltax*=.75
+          #self.deltay*=.75
+          #self.deltax*=.75
         if self.deltay < 2 and self.deltay >-2:
           self.deltax=0
 
@@ -243,20 +242,7 @@ def setupgame():#sets up the game
 
   return currentgame.thingsToDisplay
 
-def reset(team):
-  dis=setupgame()
-  if team==1:
-    team2score+=1
-  if team==2:
-    team1score+=1
-  if team1score==7 or team2score==7:
-    state='over'
 
-def reset():
-  dis=setupgame()
-  team1score=0
-  team2score=0
-  state='game'
 def changeturn(v):
   if(v==1):
     return 2
@@ -269,7 +255,6 @@ def getDistance(x1, y1, x2, y2):#https://www.pygame.org/wiki/CalculateDist
     return math.sqrt(math.pow(deltax, 2) + math.pow(deltay, 2))
 
 def playerCollision(Ball1, Ball2):
-    print("collision")
     Ball1.hittime = 0
     Ball2.hittime = 0
     BallAngle = -math.atan2((Ball2.centery - Ball1.centery), (Ball2.centerx - Ball1.centerx))
@@ -290,11 +275,6 @@ def playerCollision(Ball1, Ball2):
     Ball1.deltay = (Ball1VelocityAfterCollisionX * math.sin(BallAngle)) + (Ball1VelocityAfterCollisionY * math.cos(BallAngle))
     Ball2.deltax = (Ball2VelocityAfterCollisionX * math.cos(BallAngle)) - (Ball2VelocityAfterCollisionY * math.sin(BallAngle))
     Ball2.deltay = (Ball2VelocityAfterCollisionX * math.sin(BallAngle)) + (Ball2VelocityAfterCollisionY * math.cos(BallAngle))
-
-    Ball1.x+=(Ball1.deltax/.9)*2
-    Ball1.y-=(Ball1.deltay/.9)*2
-    Ball2.x+=(Ball2.deltax/.9)*2
-    Ball2.y-=(Ball2.deltay/.9)*2
 
 
 
@@ -336,23 +316,31 @@ i4= controlsfont.render('Press:', True, (0, 0, 0), (86, 176, 17))
 i4r = i4.get_rect()
 i4r.centerx = 300
 i4r.top =  400
-r1= controlsfont.render('instructions', True, (255, 255, 255), (0, 0, 0))
+r1= controlsfont.render('The game is taken in turns, starting with Arsenal.', True, (255, 255, 255), (0, 0, 0))
 r1r = r1.get_rect()
 r1r.centerx = window.get_rect().centerx
-r1r.top = 400
-r2= controlsfont.render('Buttons to press', True, (255, 255, 255), (0, 0, 0))
+r1r.top = 300
+r2= controlsfont.render('Click on a player and adjust the angle with A and D.', True, (255, 255, 255), (0, 0, 0))
 r2r = r2.get_rect()
 r2r.centerx = window.get_rect().centerx
-r2r.top =  450
-r3= controlsfont.render('At anytime press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
+r2r.top =  350
+r3= controlsfont.render('Press W to increase the power and S to decrease it.', True, (255, 255, 255), (0, 0, 0))
 r3r = r3.get_rect()
 r3r.centerx = window.get_rect().centerx
-r3r.top =  500
-r4= basicfont.render('How To Play', True, (255, 255, 255), (0, 0, 0))
+r3r.top =  400
+r4= controlsfont.render('Press Space bar to Launch the Player.', True, (255, 255, 255), (0, 0, 0))
 r4r = r4.get_rect()
 r4r.centerx = window.get_rect().centerx
-r4r.top =  200
-g1= controlsfont.render('Press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
+r4r.top =  450
+r5= controlsfont.render('First to 3 Wins! Press P to Play or Q to quit', True, (255, 255, 255), (0, 0, 0))
+r5r = r5.get_rect()
+r5r.centerx = window.get_rect().centerx
+r5r.top =  500
+r6= basicfont.render('How To Play', True, (255, 255, 255), (0, 0, 0))
+r6r = r6.get_rect()
+r6r.centerx = window.get_rect().centerx
+r6r.top =  200
+g1= controlsfont.render('First to 3 Wins! Press I for instructions or Q to quit', True, (255, 255, 255), (0, 0, 0))
 g1r = g1.get_rect()
 g1r.centerx = window.get_rect().centerx
 g1r.top = 700
@@ -377,6 +365,8 @@ running = True
 state='menu'
 gameball = ball(True)
 count = 0
+
+  
 while running:
   if(state=='menu'):
       window.fill((86,176,17))
@@ -405,6 +395,8 @@ while running:
       window.blit(r2,r2r)
       window.blit(r3,r3r)
       window.blit(r4,r4r)
+      window.blit(r5,r5r)
+      window.blit(r6,r6r)
       for event in pygame.event.get():
          if event.type == pygame.QUIT:
             running = False
@@ -441,14 +433,15 @@ while running:
       collisionList = []
       for o in dis:
         for k in range (1 + count, len(dis)):
-            if (getDistance(o.x + 25, o.y + 25, dis[k].x + 25, dis[k].y + 25) < 50):
+            if (getDistance(o.x + 25, o.y + 25, dis[k].x + 25, dis[k].y + 25) < 60):
                 if ((o.hittime >= 80) and (dis[k].hittime >= 80)):
                     playerCollision(o, dis[k])
                     collisionList.append(dis[k])
         if (count != (len(dis) - 1)):
             count += 1
-        if (getDistance(o.x + 25, o.y + 25, gameball.x + 10, gameball.y + 10) < 35):
-            playerCollision(o, gameball)
+        if (getDistance(o.x + 25, o.y + 25, gameball.x + 10, gameball.y + 10) < 45):
+          if (o.hittime >= 80):
+              playerCollision(o, gameball)
         window.blit(o.piece,(o.x,o.y))
         o.move()
         for elements in dis:
@@ -458,14 +451,31 @@ while running:
         if (o.isselected):
           pygame.draw.circle(window,(255,255,0),(int(o.x)+25,int(o.y)+25),26,2)
           draw_line(o, angle, 60)
-      gameball.move()
+      whoscored=gameball.move()
+      if(whoscored!=0):
+        if(whoscored==1):
+          team1score+=1
+          if(team1score==3):
+            state='over'
+        if(whoscored==2):
+          team2score+=1
+          if(team2score==3):
+            state='over'
+        dis=setupgame()
+        currentAngle = 3.14
+        moveTimer=0
+        somethingselected=False
+        currentlyselected=player(1, 'rm')
+        t=0
+        turn = 1
+        gameball = ball(True)
+        
       window.blit(gameball.piece,(gameball.x,gameball.y))
       for event in pygame.event.get():
 
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()
           for o in dis:
-              #o.move()
               xdif = pos[0]-o.x
               ydif = pos[1]-o.y
               if xdif > -50 and xdif<50 and ydif > -50 and ydif < 50 and o.team==turn:
@@ -478,19 +488,18 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:#add instructions
                 running = False
+            if event.key == pygame.K_i:#add instructions
+                state='instructions'
             if event.key == pygame.K_w:#add instructions
                 powerbar.add()
                 pygame.display.update()
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
             if event.key == pygame.K_a:
-                angle-=.1
-                print(currentAngle)
-            if event.key == pygame.K_d:
                 angle+=.1
-                print(currentAngle)
+            if event.key == pygame.K_d:
+                angle-=.1
             if event.key == pygame.K_SPACE:
-                #angle= random.randint(1, 5)#NEEDS ANGLE
                 currpow = powerbar.getpower()
                 currpow*=3
                 currentlyselected.deltax = currpow * math.cos(angle)
@@ -504,14 +513,22 @@ while running:
       pygame.display.update()
   if(state=='over'):
       window.fill((0,0,0))
+      o1= controlsfont.render('Press A to Play Again or Q to Quit', True, (255, 255, 255), (0, 0, 0))
+      o1r = o1.get_rect()
+      o1r.centerx = window.get_rect().centerx
+      o1r.top =  400
+      window.blit(o1,o1r)
       for event in pygame.event.get():
          if event.type == pygame.QUIT:
             running = False
          if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:#add instructions
                 running = False
-            if event.key == pygame.k_a:
-                reset()
+            if event.key == pygame.K_a:
+              dis=setupgame()
+              team1score=0
+              team2score=0
+              state='game'
 
       pygame.display.update()
 
