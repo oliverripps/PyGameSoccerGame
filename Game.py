@@ -15,8 +15,9 @@ class ball:
     self.piece = 'images/ball.png'
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(20,20))
-    self.x = 390
     self.angle=0
+    self.speed=0
+    self.x = 390
     self.y = 390
     self.team=3
     self.moving = not still
@@ -29,7 +30,7 @@ class ball:
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
       if self.deltax > 2 or self.deltax < -2:
-        self.deltax *= .95
+        self.deltax *= .999
 
         self.x += int(self.deltax)
         if self.x<60:#fix for left bound
@@ -52,7 +53,7 @@ class ball:
           self.deltax=0
 
       if self.deltay > 2 or self.deltay < -2:
-        self.deltay *= .95
+        self.deltay *= .999
         self.y -= int(self.deltay)
         self.centery = self.y + 10
         if self.y<200:#fix for upper bound
@@ -76,6 +77,7 @@ class bar:
     self.value=0
     self.x = 750
     self.y = 120
+    self.team = 3
   def add(self):
     if(self.value<8):
         self.setvalue(self.value+1)
@@ -108,6 +110,8 @@ class bar:
 class player:
   def __init__(self,team,position):
     self.team = team
+    self.speed=0
+    self.angle=0
     self.isselected=False
     if(team==1):
       self.piece='images/arsenal.png'
@@ -137,7 +141,6 @@ class player:
     if(position=='CB' and team==2):
         self.y = 375
         self.x = 80
-    self.angle = 0
     self.piece = pygame.image.load(self.piece)
     self.piece = pygame.transform.scale(self.piece,(50,50))
     self.deltax=0
@@ -155,11 +158,21 @@ class player:
       self.isselected=True
   def unselect(self):
       self.isselected=False
+  def move(self):
+        self.x += math.sin(self.angle) * self.speed
+        self.y -= math.cos(self.angle) * self.speed
+
   def getangle(self):
       return angle
   def go(self, p, a):
       self.angle=a
       self.speed=p
+  def pos(self):
+    return (self.x+25, self.y+25)
+  def getX(self):
+    return self.x+25
+  def getY(self):
+    return self.y+25
 
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
@@ -204,7 +217,9 @@ class player:
         if self in moving:
           moving.remove(self)
 
-
+def draw_line(player, angle, line_length):
+  pos2 = (player.getX() + line_length*math.cos(angle),player.getY() + line_length*(-1*math.sin(angle)))
+  pygame.draw.line(window, (0,0,0), player.pos(), pos2, 5)
 
 def setupgame():#sets up the game
   currentgame = game()
@@ -351,11 +366,13 @@ team1score=0
 dis = setupgame()
 moving = []
 powerbar = bar()
+currentAngle = 3.14
+moveTimer=0
 somethingselected=False
 currentlyselected=player(1, 'rm')
 t=0
 turn = 1
-angle=0
+angle=3.14
 running = True
 state='menu'
 gameball = ball(True)
@@ -429,7 +446,7 @@ while running:
                     playerCollision(o, dis[k])
                     collisionList.append(dis[k])
         if (count != (len(dis) - 1)):
-            count += 1;
+            count += 1
         if (getDistance(o.x + 25, o.y + 25, gameball.x + 10, gameball.y + 10) < 35):
             playerCollision(o, gameball)
         window.blit(o.piece,(o.x,o.y))
@@ -440,6 +457,7 @@ while running:
 
         if (o.isselected):
           pygame.draw.circle(window,(255,255,0),(int(o.x)+25,int(o.y)+25),26,2)
+          draw_line(o, angle, 60)
       gameball.move()
       window.blit(gameball.piece,(gameball.x,gameball.y))
       for event in pygame.event.get():
@@ -447,6 +465,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()
           for o in dis:
+              #o.move()
               xdif = pos[0]-o.x
               ydif = pos[1]-o.y
               if xdif > -50 and xdif<50 and ydif > -50 and ydif < 50 and o.team==turn:
@@ -461,10 +480,17 @@ while running:
                 running = False
             if event.key == pygame.K_w:#add instructions
                 powerbar.add()
+                pygame.display.update()
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
+            if event.key == pygame.K_a:
+                angle-=.1
+                print(currentAngle)
+            if event.key == pygame.K_d:
+                angle+=.1
+                print(currentAngle)
             if event.key == pygame.K_SPACE:
-                angle= random.randint(1, 5)#NEEDS ANGLE
+                #angle= random.randint(1, 5)#NEEDS ANGLE
                 currpow = powerbar.getpower()
                 currpow*=3
                 currentlyselected.deltax = currpow * math.cos(angle)
