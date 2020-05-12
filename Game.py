@@ -22,6 +22,9 @@ class ball:
     self.moving = not still
     self.deltax=0
     self.deltay=0
+    self.centerx = self.x + 10
+    self.centery = self.y + 10
+    self.hittime = 80
 
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
@@ -35,6 +38,7 @@ class ball:
           else:
             self.deltax*=-1
             self.x+=20
+            self.centerx = self.x + 10
 
         if self.x>740:#fix for right bound
           if self.y>350 and self.y< 450:#fi
@@ -42,24 +46,21 @@ class ball:
           else:
             self.deltax*=-1
             self.x-=20
+            self.centerx = self.x + 10
 
         if self.deltax < 2 and self.deltax >-2:
           self.deltax=0
 
       if self.deltay > 2 or self.deltay < -2:
         self.deltay *= .95
-        print("deltay:")
-        print(self.deltay)
         self.y -= int(self.deltay)
+        self.centery = self.y + 10
         if self.y<200:#fix for upper bound
           self.deltay*=-1
 
 
-        if self.y>600:#fix for lower bound
-          print("too low")
-          print(self.deltay)
+        if self.y>600:#fix for lower boun
           self.deltay=self.deltay *-1
-          print(self.deltay)
           #self.y-=100
 
         if self.deltay < 2 and self.deltay >-2:
@@ -141,6 +142,10 @@ class player:
     self.piece = pygame.transform.scale(self.piece,(50,50))
     self.deltax=0
     self.deltay=0
+    self.hittime = 80
+    if (position != 'rm'):
+        self.centerx = self.x + 25
+        self.centery = self.x + 25
 
   def isteam1(self):
       return self.team==1
@@ -159,33 +164,37 @@ class player:
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
       if self.deltax > 2 or self.deltax < -2:
-        self.deltax *= .95
+        self.deltax *= .99
 
         self.x += int(self.deltax)
         if self.x<50:#fix for left bound
           self.deltax*=-1
           self.x+=(self.deltax/.9)
+          self.centerx = self.x + 25
           self.deltax*=.75
           self.deltay*=.75
         if self.x>700:#fix for right bound
           self.deltax*=-1
           self.x+=(self.deltax/.9)
+          self.centerx = self.x + 25
           self.deltax*=.75
           self.deltay*=.75
         if self.deltax < 2 and self.deltax >-2:
           self.deltax=0
 
       if self.deltay > 2 or self.deltay < -2:
-        self.deltay *= .95
+        self.deltay *= .99
         self.y -= int(self.deltay)
         if self.y<150:#fix for upper bound
           self.deltay*=-1
           self.y-= (self.deltay/.9)
+          self.centery = self.y + 25
           self.deltay*=.75
           self.deltax*=.75
         if self.y>600:#fix for lower bound
           self.deltay=self.deltay *-1
           self.y-= (self.deltay/.9)
+          self.centery = self.y + 25
           self.deltay*=.75
           self.deltax*=.75
         if self.deltay < 2 and self.deltay >-2:
@@ -245,7 +254,10 @@ def getDistance(x1, y1, x2, y2):#https://www.pygame.org/wiki/CalculateDist
     return math.sqrt(math.pow(deltax, 2) + math.pow(deltay, 2))
 
 def playerCollision(Ball1, Ball2):
-    BallAngle = -math.atan2((Ball2.y - Ball1.y), (Ball2.x - Ball1.x))
+    print("collision")
+    Ball1.hittime = 0
+    Ball2.hittime = 0
+    BallAngle = -math.atan2((Ball2.centery - Ball1.centery), (Ball2.centerx - Ball1.centerx))
     deltaVelocityX = Ball1.deltax - Ball2.deltax
     deltaVelocityY = Ball1.deltay - Ball2.deltay
 
@@ -263,6 +275,12 @@ def playerCollision(Ball1, Ball2):
     Ball1.deltay = (Ball1VelocityAfterCollisionX * math.sin(BallAngle)) + (Ball1VelocityAfterCollisionY * math.cos(BallAngle))
     Ball2.deltax = (Ball2VelocityAfterCollisionX * math.cos(BallAngle)) - (Ball2VelocityAfterCollisionY * math.sin(BallAngle))
     Ball2.deltay = (Ball2VelocityAfterCollisionX * math.sin(BallAngle)) + (Ball2VelocityAfterCollisionY * math.cos(BallAngle))
+
+    Ball1.x+=(Ball1.deltax/.9)*2
+    Ball1.y-=(Ball1.deltay/.9)*2
+    Ball2.x+=(Ball2.deltax/.9)*2
+    Ball2.y-=(Ball2.deltay/.9)*2
+
 
 
 pygame.init()
@@ -403,16 +421,22 @@ while running:
       pygame.draw.rect(window,powerbar.color,powerrect)
       window.blit(g1,g1r)
       count = 0
+      collisionList = []
       for o in dis:
         for k in range (1 + count, len(dis)):
-            if (getDistance(o.x, o.y, dis[k].x, dis[k].y) < 50):
-                playerCollision(o, dis[k])
+            if (getDistance(o.x + 25, o.y + 25, dis[k].x + 25, dis[k].y + 25) < 50):
+                if ((o.hittime >= 80) and (dis[k].hittime >= 80)):
+                    playerCollision(o, dis[k])
+                    collisionList.append(dis[k])
         if (count != (len(dis) - 1)):
             count += 1;
-        if (getDistance(o.x, o.y, gameball.x, gameball.y) < 35):
+        if (getDistance(o.x + 25, o.y + 25, gameball.x + 10, gameball.y + 10) < 35):
             playerCollision(o, gameball)
         window.blit(o.piece,(o.x,o.y))
         o.move()
+        for elements in dis:
+            if (elements.hittime < 80):
+                elements.hittime += 1
 
         if (o.isselected):
           pygame.draw.circle(window,(255,255,0),(int(o.x)+25,int(o.y)+25),26,2)
@@ -442,7 +466,7 @@ while running:
             if event.key == pygame.K_SPACE:
                 angle= random.randint(1, 5)#NEEDS ANGLE
                 currpow = powerbar.getpower()
-                currpow*=8
+                currpow*=3
                 currentlyselected.deltax = currpow * math.cos(angle)
                 currentlyselected.deltay = currpow * math.sin(angle)
                 powerbar.clear()
