@@ -4,8 +4,7 @@ import time
 import math
 
 class game:
-  def __init__(self,nameOfPlayer):
-    name=nameOfPlayer
+  def __init__(self):
     self.thingsToDisplay=[]
   def add(self,thing):
     self.thingsToDisplay.append(thing)
@@ -35,14 +34,14 @@ class ball:
         self.x += int(self.deltax)
         if self.x<60:#fix for left bound
           if self.y>350 and self.y< 450:#fi
-            reset()
+            reset(turn)
           else:
             self.deltax*=-1
             self.x+=20
             
         if self.x>740:#fix for right bound
           if self.y>350 and self.y< 450:#fi
-            reset()
+            reset(turn)
           else:
             self.deltax*=-1
             self.x-=20
@@ -95,7 +94,7 @@ class bar:
         self.color = (255,255,0)
     if(val==5 or val ==6):
         self.color = (255,165,0)
-    if(val==7 and val ==8):
+    if(val==7 or val ==8):
         self.color = (255,0,0)
   def getpower(self):
     return self.value
@@ -145,6 +144,7 @@ class player:
     self.piece = pygame.transform.scale(self.piece,(50,50))
     self.deltax=0
     self.deltay=0
+    
   def isteam1(self):
       return self.team==1
   def isteam2(self):
@@ -169,10 +169,12 @@ class player:
           self.deltax*=-1
           self.x+=(self.deltax/.9)
           self.deltax*=.75
+          self.deltay*=.75
         if self.x>700:#fix for right bound
           self.deltax*=-1
           self.x+=(self.deltax/.9)
           self.deltax*=.75
+          self.deltay*=.75
         if self.deltax < 2 and self.deltax >-2:
           self.deltax=0
           
@@ -183,11 +185,12 @@ class player:
           self.deltay*=-1
           self.y-= (self.deltay/.9)
           self.deltay*=.75
-            
+          self.deltax*=.75
         if self.y>600:#fix for lower bound
           self.deltay=self.deltay *-1
           self.y-= (self.deltay/.9)
           self.deltay*=.75
+          self.deltax*=.75
         if self.deltay < 2 and self.deltay >-2:
           self.deltax=0
       
@@ -197,9 +200,8 @@ class player:
         
       
     
-def setupgame(name):#sets up the game
-  currentgame = game(name)
-  gameball = ball(True)
+def setupgame():#sets up the game
+  currentgame = game()
   st1 = player(1,'ST')
   st2 = player(2,'ST')
   lm1 = player(1,'LM')
@@ -208,7 +210,6 @@ def setupgame(name):#sets up the game
   rm2 = player(2,'RM')
   cb1 = player(1,'CB')
   cb2 = player(2,'CB')
-  currentgame.add(gameball)
   currentgame.add(st1)
   currentgame.add(st2)
   currentgame.add(lm1)
@@ -221,9 +222,20 @@ def setupgame(name):#sets up the game
   
   return currentgame.thingsToDisplay
   
-def reset():
-  dis=setupgame('Oliver')
+def reset(team):
+  dis=setupgame()
+  if team==1:
+    team2score+=1
+  if team==2:
+    team1score+=1
+  if team1score==7 or team2score==7:
+    state='over'
 
+def reset():
+  dis=setupgame()
+  team1score=0
+  team2score=0
+  state='game'
 def changeturn(v):
   if(v==1):
     return 2
@@ -300,7 +312,9 @@ gametext = basicfont.render('London Derby(Emirates Stadium)', True, (255, 255, 2
 gametextrectangle = gametext.get_rect()#Creating rectangle for text
 gametextrectangle.centerx = window.get_rect().centerx
 gametextrectangle.top = 40
-dis = setupgame('Oliver')
+team2score=0
+team1score=0
+dis = setupgame()
 moving = []
 powerbar = bar()
 somethingselected=False
@@ -310,6 +324,7 @@ turn = 1
 angle=0
 running = True
 state='menu'
+gameball = ball(True)
 while running:
   if(state=='menu'):
       window.fill((86,176,17))
@@ -353,10 +368,20 @@ while running:
       pygame.display.update()
       
   if(state=='game'):
+      scoretext = menufont.render("%s" % team2score, True, (255, 255, 255), (0, 0, 0))#
+      sctr = scoretext.get_rect()#Creating rectangle for text
+      sctr.centerx = 250
+      sctr.top = 85
+      scoretext2 = menufont.render("%s" % team1score, True, (255, 255, 255), (0, 0, 0))#
+      sctr2 = scoretext2.get_rect()#Creating rectangle for text
+      sctr2.centerx = 550
+      sctr2.top = 85
       window.fill((0,0,0))
       window.blit(field, (0,129))
       window.blit(gametext, gametextrectangle)
       window.blit(powertext,(725,20))
+      window.blit(scoretext,sctr)
+      window.blit(scoretext2,sctr2)
       powerrect = pygame.Rect(powerbar.x,powerbar.y,15,powerbar.value*-10)
       pygame.draw.rect(window,powerbar.color,powerrect)
       window.blit(g1,g1r)
@@ -365,7 +390,8 @@ while running:
         o.move()
         if (o.isselected):
           pygame.draw.circle(window,(255,255,0),(int(o.x)+25,int(o.y)+25),26,2)
-      pygame.display.update()
+      gameball.move()
+      window.blit(gameball.piece,(gameball.x,gameball.y))
       for event in pygame.event.get():
         
         if event.type == pygame.MOUSEBUTTONUP:
@@ -388,7 +414,7 @@ while running:
             if event.key == pygame.K_s:#add instructions
                 powerbar.minus()
             if event.key == pygame.K_SPACE:
-                angle= random.randint(1, 5)
+                angle= random.randint(1, 5)#NEEDS ANGLE
                 currpow = powerbar.getpower()
                 currpow*=8
                 currentlyselected.deltax = currpow * math.cos(angle)
