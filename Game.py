@@ -30,7 +30,7 @@ class ball:
     if(self.deltax != 0 or self.deltay != 0):
       if self.deltax > 2 or self.deltax < -2:
         self.deltax *= .95
-
+        
         self.x += int(self.deltax)
         if self.x<60:#fix for left bound
           if self.y>350 and self.y< 450:#fi
@@ -38,7 +38,7 @@ class ball:
           else:
             self.deltax*=-1
             self.x+=20
-
+            
         if self.x>740:#fix for right bound
           if self.y>350 and self.y< 450:#fi
             reset(turn)
@@ -48,7 +48,7 @@ class ball:
 
         if self.deltax < 2 and self.deltax >-2:
           self.deltax=0
-
+          
       if self.deltay > 2 or self.deltay < -2:
         self.deltay *= .95
         print("deltay:")
@@ -56,8 +56,8 @@ class ball:
         self.y -= int(self.deltay)
         if self.y<200:#fix for upper bound
           self.deltay*=-1
-
-
+          
+            
         if self.y>600:#fix for lower bound
           print("too low")
           print(self.deltay)
@@ -67,11 +67,11 @@ class ball:
 
         if self.deltay < 2 and self.deltay >-2:
           self.deltax=0
-
+      
       else:
         if self in moving:
           moving.remove(self)
-
+        
 class bar:
   def __init__(self):
     self.color = (0,0,0)
@@ -83,7 +83,7 @@ class bar:
         self.setvalue(self.value+1)
   def minus(self):
     if(self.value>0):
-        self.setvalue(self.value-1)
+        self.setvalue(self.value-1)  
   def setvalue(self,val):
     self.value=val
     if(val==0):
@@ -102,7 +102,7 @@ class bar:
   def clear(self):
     self.value=0
     self.color = (0,0,0)
-
+  
 
 
 
@@ -144,7 +144,7 @@ class player:
     self.piece = pygame.transform.scale(self.piece,(50,50))
     self.deltax=0
     self.deltay=0
-
+    
   def isteam1(self):
       return self.team==1
   def isteam2(self):
@@ -158,12 +158,12 @@ class player:
   def go(self, p, a):
       self.angle=a
       self.speed=p
-
+  
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
       if self.deltax > 2 or self.deltax < -2:
         self.deltax *= .95
-
+        
         self.x += int(self.deltax)
         if self.x<50:#fix for left bound
           self.deltax*=-1
@@ -177,7 +177,7 @@ class player:
           self.deltay*=.75
         if self.deltax < 2 and self.deltax >-2:
           self.deltax=0
-
+          
       if self.deltay > 2 or self.deltay < -2:
         self.deltay *= .95
         self.y -= int(self.deltay)
@@ -193,13 +193,13 @@ class player:
           self.deltax*=.75
         if self.deltay < 2 and self.deltay >-2:
           self.deltax=0
-
+      
       else:
         if self in moving:
           moving.remove(self)
-
-
-
+        
+      
+    
 def setupgame():#sets up the game
   currentgame = game()
   st1 = player(1,'ST')
@@ -218,10 +218,10 @@ def setupgame():#sets up the game
   currentgame.add(rm2)
   currentgame.add(cb1)
   currentgame.add(cb2)
-
-
+  
+  
   return currentgame.thingsToDisplay
-
+  
 def reset(team):
   dis=setupgame()
   if team==1:
@@ -241,13 +241,13 @@ def changeturn(v):
     return 2
   if(v==2):
     return 1
-
+  
 def getDistance(x1, y1, x2, y2):#https://www.pygame.org/wiki/CalculateDist
     deltay = y2 - y1
     deltax = x2 - x1
     return math.sqrt(math.pow(deltax, 2) + math.pow(deltay, 2))
 
-
+        
 
 pygame.init()
 pygame.font.init()
@@ -352,7 +352,7 @@ while running:
                 state='game'
             if event.key == pygame.K_i:#add instructions
                 state='instructions'
-
+            
 
       pygame.display.update()
   if(state=='instructions'):
@@ -373,10 +373,10 @@ while running:
                 state='game'
             if event.key == pygame.K_m:#add instructions
                 state='menu'
-
+            
 
       pygame.display.update()
-
+      
   if(state=='game'):
       scoretext = menufont.render("%s" % team2score, True, (255, 255, 255), (0, 0, 0))#
       sctr = scoretext.get_rect()#Creating rectangle for text
@@ -403,7 +403,7 @@ while running:
       gameball.move()
       window.blit(gameball.piece,(gameball.x,gameball.y))
       for event in pygame.event.get():
-
+        
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()
           for o in dis:
@@ -437,7 +437,7 @@ while running:
                 currentlyselected.isselected=False
                 currentlyselected=player(1, 'rm')
 
-      pygame.display.update()
+      pygame.display.update()  
   if(state=='over'):
       window.fill((0,0,0))
       for event in pygame.event.get():
@@ -448,8 +448,8 @@ while running:
                 running = False
             if event.key == pygame.k_p:
                 reset()
-
+            
       pygame.display.update()
-
+    
 
 pygame.quit()
