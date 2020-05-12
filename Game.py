@@ -28,7 +28,7 @@ class ball:
 
   def move(self):
     if(self.deltax != 0 or self.deltay != 0):
-      if self.deltax > 2 or self.deltax < -2:
+      if self.deltax > 1.5 or self.deltax < -1.5:
         self.deltax *= .95
         
         self.x += int(self.deltax)
@@ -46,10 +46,10 @@ class ball:
             self.deltax*=-1
             self.x-=20
 
-        if self.deltax < 2 and self.deltax >-2:
+        if self.deltax < 1.5 and self.deltax >-1.5:
           self.deltax=0
           
-      if self.deltay > 2 or self.deltay < -2:
+      if self.deltay > 1.5 or self.deltay < -1.5:
         self.deltay *= .95
         print("deltay:")
         print(self.deltay)
@@ -65,7 +65,7 @@ class ball:
           print(self.deltay)
           #self.y-=100
 
-        if self.deltay < 2 and self.deltay >-2:
+        if self.deltay < 1.5 and self.deltay >-1.5:
           self.deltax=0
       
       else:
