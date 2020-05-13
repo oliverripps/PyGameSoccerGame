@@ -455,11 +455,11 @@ while running:
       if(whoscored!=0):
         if(whoscored==1):
           team2score+=1
-          if(team1score==3):
+          if(team2score==3):
             state='over'
         if(whoscored==2):
           team1score+=1
-          if(team2score==3):
+          if(team1score==3):
             state='over'
         dis=setupgame()
         currentAngle = 3.14
